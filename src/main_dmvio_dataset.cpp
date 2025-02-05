@@ -32,12 +32,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "IOWrapper/Output3DWrapper.h"
 #include "IOWrapper/ImageDisplay.h"
 
 
-#include <boost/thread.hpp>
+#include <thread>
 #include "dso/util/settings.h"
 #include "dso/util/globalFuncs.h"
 #include "dso/util/DatasetReader.h"
@@ -394,7 +395,7 @@ int main(int argc, char** argv)
     }
 
     // hook crtl+C.
-    boost::thread exThread = boost::thread(exitThread);
+    std::thread exThread = std::thread(exitThread);
 
     ImageFolderReader* reader = new ImageFolderReader(source, mainSettings.calib, mainSettings.gammaCalib, mainSettings.vignette, use16Bit, tsFile);
     reader->loadIMUData(imuFile);
@@ -405,7 +406,7 @@ int main(int argc, char** argv)
         IOWrap::PangolinDSOViewer* viewer = new IOWrap::PangolinDSOViewer(wG[0], hG[0], false, settingsUtil,
                                                                           nullptr);
 
-        boost::thread runThread = boost::thread(boost::bind(run, reader, viewer));
+        std::thread runThread = std::thread(std::bind(run, reader, viewer));
 
         viewer->run();
 

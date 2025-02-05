@@ -23,7 +23,7 @@
 * along with DSO. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <sys/time.h>
 
 #include "PangolinDSOViewer.h"
 #include "KeyFrameDisplay.h"
@@ -51,7 +51,7 @@ PangolinDSOViewer::PangolinDSOViewer(int w, int h, bool startRunThread, std::sha
 
 
 	{
-		boost::unique_lock<boost::mutex> lk(openImagesMutex);
+		std::unique_lock<std::mutex> lk(openImagesMutex);
 		internalVideoImg = new MinimalImageB3(w,h);
 		internalKFImg = new MinimalImageB3(w,h);
 		internalResImg = new MinimalImageB3(w,h);
@@ -72,7 +72,7 @@ PangolinDSOViewer::PangolinDSOViewer(int w, int h, bool startRunThread, std::sha
 
 
     if(startRunThread)
-        runThread = boost::thread(&PangolinDSOViewer::run, this);
+        runThread = std::thread(&PangolinDSOViewer::run, this);
 
 }
 
@@ -191,7 +191,7 @@ void PangolinDSOViewer::run()
             double sizeFactor = 1.0;
 
             // I need model3DMutex lock before I get currentCam->camToWorld.
-            boost::unique_lock<boost::mutex> lk3d(model3DMutex);
+            std::unique_lock<std::mutex> lk3d(model3DMutex);
 
             auto updatedVisualization3DCam = followCam.updateVisualizationCam(currentCam->camToWorld,
                                                                          Visualization3D_camera);
@@ -259,7 +259,7 @@ void PangolinDSOViewer::run()
 
         // Update scale and status text.
         {
-            boost::unique_lock<boost::mutex> lk(model3DMutex);
+            std::unique_lock<std::mutex> lk(model3DMutex);
             if(transformDSOToIMU)
             {
                 settings_Scale = transformDSOToIMU->getScale();
@@ -539,7 +539,7 @@ void PangolinDSOViewer::publishKeyframes(
 	if(!setting_render_display3D) return;
     if(disableAllDisplay) return;
 
-	boost::unique_lock<boost::mutex> lk(model3DMutex);
+	std::unique_lock<std::mutex> lk(model3DMutex);
 	for(FrameHessian* fh : frames)
 	{
 		if(keyframesByKFID.find(fh->frameID) == keyframesByKFID.end())
@@ -558,7 +558,7 @@ void PangolinDSOViewer::publishCamPose(FrameShell* frame,
     if(!setting_render_display3D) return;
     if(disableAllDisplay) return;
 
-	boost::unique_lock<boost::mutex> lk(model3DMutex);
+	std::unique_lock<std::mutex> lk(model3DMutex);
 	struct timeval time_now;
 	gettimeofday(&time_now, NULL);
 	lastNTrackingMs.push_back(((time_now.tv_sec-last_track.tv_sec)*1000.0f + (time_now.tv_usec-last_track.tv_usec)/1000.0f));
@@ -579,7 +579,7 @@ void PangolinDSOViewer::pushLiveFrame(FrameHessian* image)
 	if(!setting_render_displayVideo) return;
     if(disableAllDisplay) return;
 
-	boost::unique_lock<boost::mutex> lk(openImagesMutex);
+	std::unique_lock<std::mutex> lk(openImagesMutex);
 
 	for(int i=0;i<w*h;i++)
 		internalVideoImg->data[i][0] =
@@ -600,7 +600,7 @@ void PangolinDSOViewer::pushDepthImage(MinimalImageB3* image)
     if(!setting_render_displayDepth) return;
     if(disableAllDisplay) return;
 
-	boost::unique_lock<boost::mutex> lk(openImagesMutex);
+	std::unique_lock<std::mutex> lk(openImagesMutex);
 
 	struct timeval time_now;
 	gettimeofday(&time_now, NULL);
@@ -617,20 +617,20 @@ void PangolinDSOViewer::publishTransformDSOToIMU(const dmvio::TransformDSOToIMU&
     if(!setting_render_display3D) return;
     if(disableAllDisplay) return;
 
-    boost::unique_lock<boost::mutex> lk(model3DMutex);
+    std::unique_lock<std::mutex> lk(model3DMutex);
     transformDSOToIMU = std::make_unique<dmvio::TransformDSOToIMU>(transformDSOToIMUPassed, std::make_shared<bool>(false),
             std::make_shared<bool>(false), std::make_shared<bool>(false));
 }
 
 void PangolinDSOViewer::publishSystemStatus(dmvio::SystemStatus systemStatus)
 {
-    boost::unique_lock<boost::mutex> lk(model3DMutex);
+    std::unique_lock<std::mutex> lk(model3DMutex);
     this->systemStatus = systemStatus;
 }
 
-void PangolinDSOViewer::addGTCamPose(const Sophus::SE3& gtPose)
+void PangolinDSOViewer::addGTCamPose(const Sophus::SE3d& gtPose)
 {
-	boost::unique_lock<boost::mutex> lk(model3DMutex);
+	std::unique_lock<std::mutex> lk(model3DMutex);
 
 	if(!setting_render_display3D || !HCalib) return;
 

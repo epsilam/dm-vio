@@ -71,11 +71,11 @@ public:
     size_t dim() const override;
 
     /** linearize to a GaussianFactor */
-    boost::shared_ptr<gtsam::GaussianFactor> linearize(const gtsam::Values& c) const override;
+    std::shared_ptr<gtsam::GaussianFactor> linearize(const gtsam::Values& c) const override;
 
     virtual gtsam::NonlinearFactor::shared_ptr clone() const
     {
-        return boost::static_pointer_cast<gtsam::NonlinearFactor>(
+        return std::static_pointer_cast<gtsam::NonlinearFactor>(
                 gtsam::NonlinearFactor::shared_ptr(new PoseTransformationFactor(*this)));
     }
 

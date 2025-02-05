@@ -56,7 +56,7 @@ public:
     typedef std::function<void(const gtsam::Values& values, bool willReplaceGraph)> InitCallback;
 
     // Note that a reference to the settings and imuCalibration, and also delayedMarginalization is kept!
-    IMUInitializer(std::string resultsPrefix, boost::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
+    IMUInitializer(std::string resultsPrefix, std::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
                    const IMUCalibration& imuCalibration, IMUInitSettings& settings,
                    DelayedMarginalizationGraphs* delayedMarginalization, bool linearizeOperation,
                    InitCallback callOnInit);

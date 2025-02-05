@@ -41,30 +41,28 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 using namespace gtsam;
 
-dmvio::AugmentedScatter::AugmentedScatter(const GaussianFactorGraph& gfg, boost::optional<const Ordering&> ordering, const std::map<gtsam::Key, size_t>& keyDimMap)
+dmvio::AugmentedScatter::AugmentedScatter(const GaussianFactorGraph& gfg, const Ordering& ordering, const std::map<gtsam::Key, size_t>& keyDimMap)
 {
     // If we have an ordering, pre-fill the ordered variables first
-    if (ordering) {
-        for (Key key : *ordering) {
-            std::map<gtsam::Key, size_t>::const_iterator it = keyDimMap.find(key);
-            unsigned long dim = 0;
-            if(it != keyDimMap.end())
-            {
-                dim = it->second;
-            }
-            add(key, dim);
+    for (Key key : ordering) {
+        std::map<gtsam::Key, size_t>::const_iterator it = keyDimMap.find(key);
+        unsigned long dim = 0;
+        if(it != keyDimMap.end())
+        {
+            dim = it->second;
         }
+        add(key, dim);
     }
-    
+
     // Now, find dimensions of variables and/or extend
     for (const auto& factor : gfg) {
         if (!factor)
             continue;
-        
+
         // TODO: Fix this hack to cope with zero-row Jacobians that come from BayesTreeOrphanWrappers
         const JacobianFactor* asJacobian = dynamic_cast<const JacobianFactor*>(factor.get());
         if (asJacobian && asJacobian->cols() <= 1) continue;
-        
+
         // loop over variables
         for (GaussianFactor::const_iterator variable = factor->begin();
              variable != factor->end(); ++variable) {
@@ -76,12 +74,12 @@ dmvio::AugmentedScatter::AugmentedScatter(const GaussianFactorGraph& gfg, boost:
                 add(key, factor->getDim(variable));
         }
     }
-    
+
     // To keep the same behavior as before, sort the keys after the ordering
     iterator first = begin();
-    if (ordering) first += ordering->size();
+    first += ordering.size();
     if (first != end()) std::sort(first, end());
-    
+
     // Filter out keys with zero dimensions (if ordering had more keys)
     erase(std::remove_if(begin(), end(), SlotEntry::Zero), end());
 }

@@ -21,7 +21,10 @@
 */
 
 #include "GravityInitializer.h"
-#include <boost/math/constants/constants.hpp>
+#include <cmath>
+#ifndef M_PI
+#define M_PI (3.14159265358979323846)
+#endif
 
 using dmvio::GravityInitializer;
 using dmvio::IMUIntegration;
@@ -79,7 +82,7 @@ double dmvio::getGravityError(const Sophus::SE3d& imuToWorld, const Sophus::SE3d
 
     // Compute angle between the two vectors.
     double angle = std::acos(gDrone.dot(gDroneGT) / (gDrone.norm() * gDroneGT.norm()));
-    double degrees = (angle * 180.0) / boost::math::constants::pi<double>();
+    double degrees = (angle * 180.0) / M_PI;
 
     return degrees;
 }

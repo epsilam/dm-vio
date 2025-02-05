@@ -44,7 +44,7 @@ public:
     // Typically initCoarseGraph should also be called before using this.
     // Note that a reference to imuCalibration and imuSettings is kept, so they need to be kept alive.
     CoarseIMULogic(std::unique_ptr<PoseTransformation> transformBAToIMU,
-                   boost::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
+                   std::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
                    const IMUCalibration& imuCalibration,
                    IMUSettings& imuSettings);
 
@@ -57,7 +57,7 @@ public:
     Sophus::SE3d addIMUData(const IMUData& imuData,
                             int frameId, double frameTimestamp,
                             int lastFrameId,
-                            boost::shared_ptr<gtsam::PreintegratedImuMeasurements> additionalMeasurements = nullptr,
+                            std::shared_ptr<gtsam::PreintegratedImuMeasurements> additionalMeasurements = nullptr,
                             int dontMargFrame = -1);
 
     // ------------------------------
@@ -98,10 +98,10 @@ private:
     std::unique_ptr<PoseTransformation> transformIMUToDSOForCoarse; // Usually of type TransformIMUToDSOForCoarse<T>
     double scale = 1.0;
 
-    boost::shared_ptr<gtsam::PreintegrationParams> preintegrationParams;
+    std::shared_ptr<gtsam::PreintegrationParams> preintegrationParams;
 
-    boost::shared_ptr<gtsam::NonlinearFactorGraph> coarseGraph;
-    boost::shared_ptr<gtsam::Values> coarseValues;
+    std::shared_ptr<gtsam::NonlinearFactorGraph> coarseGraph;
+    std::shared_ptr<gtsam::Values> coarseValues;
 
     gtsam::Key currentPoseKey, refPoseKey;
 

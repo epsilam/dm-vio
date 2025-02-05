@@ -48,20 +48,20 @@ public:
     ScaleGTSAM inverse() const;
 
     static gtsam::Vector1 Logmap(const ScaleGTSAM& s,
-                                 gtsam::OptionalJacobian<1, 1> Hm = boost::none);
+                                 gtsam::OptionalJacobian<1, 1> Hm = std::nullopt);
 
     static ScaleGTSAM Expmap(const gtsam::Vector1& v,
-                             gtsam::OptionalJacobian<1, 1> Hm = boost::none);
+                             gtsam::OptionalJacobian<1, 1> Hm = std::nullopt);
 
     /// Chart at the origin
     struct ChartAtOrigin
     {
-        static ScaleGTSAM Retract(const gtsam::Vector1& v, ChartJacobian H = boost::none)
+        static ScaleGTSAM Retract(const gtsam::Vector1& v, ChartJacobian H = std::nullopt)
         {
             return ScaleGTSAM::Expmap(v, H);
         }
 
-        static gtsam::Vector1 Local(const ScaleGTSAM& other, ChartJacobian H = boost::none)
+        static gtsam::Vector1 Local(const ScaleGTSAM& other, ChartJacobian H = std::nullopt)
         {
             return ScaleGTSAM::Logmap(other, H);
         }

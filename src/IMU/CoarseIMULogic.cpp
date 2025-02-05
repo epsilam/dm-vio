@@ -28,9 +28,11 @@
 #include "IMUUtils.h"
 #include "GTSAMIntegration/GTSAMUtils.h"
 
+#include <iomanip>
+
 
 dmvio::CoarseIMULogic::CoarseIMULogic(std::unique_ptr<PoseTransformation> transformBAToIMU,
-                                      boost::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
+                                      std::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
                                       const IMUCalibration& imuCalibration, dmvio::IMUSettings& imuSettings)
         : transformBAToIMU(std::move(transformBAToIMU)),
           preintegrationParams(preintegrationParams),
@@ -43,7 +45,7 @@ dmvio::CoarseIMULogic::CoarseIMULogic(std::unique_ptr<PoseTransformation> transf
 
 Sophus::SE3d dmvio::CoarseIMULogic::addIMUData(const dmvio::IMUData& imuData, int frameId, double frameTimestamp,
                                                int lastFrameId,
-                                               boost::shared_ptr<gtsam::PreintegratedImuMeasurements> additionalMeasurements,
+                                               std::shared_ptr<gtsam::PreintegratedImuMeasurements> additionalMeasurements,
                                                int dontMargFrame)
 {
     dmvio::TimeMeasurement timeMeasurement("addIMUData");
@@ -108,7 +110,7 @@ Sophus::SE3d dmvio::CoarseIMULogic::addIMUData(const dmvio::IMUData& imuData, in
     gtsam::Key biasPrevKey = gtsam::Symbol('b', lastFrameId);
 
     // Integrate IMU data
-    boost::shared_ptr<gtsam::PreintegratedImuMeasurements> imuMeasurements;
+    std::shared_ptr<gtsam::PreintegratedImuMeasurements> imuMeasurements;
     if(additionalMeasurements)
     {
         imuMeasurements = additionalMeasurements;
@@ -166,15 +168,15 @@ Sophus::SE3d dmvio::CoarseIMULogic::addIMUData(const dmvio::IMUData& imuData, in
             new gtsam::LevenbergMarquardtOptimizer(*coarseGraph, *coarseValues));
     gtsam::Values optimizedValues = optimizer->optimize();
     gtsam::Values newValues;
-    for(gtsam::Values::iterator it = optimizedValues.begin(); it != optimizedValues.end(); ++it)
+    for(const auto& it : optimizedValues)
     {
-        if(gtsam::Symbol((*it).key).index() == currentKeyframeId && imuSettings.fixKeyframeDuringCoarseTracking)
+        if(gtsam::Symbol(it.key).index() == currentKeyframeId && imuSettings.fixKeyframeDuringCoarseTracking)
         {
             // Don't change the values of the keyframe...
-            newValues.insert(it->key, coarseValues->at(it->key));
+            newValues.insert(it.key, coarseValues->at(it.key));
         }else
         {
-            newValues.insert(it->key, it->value);
+            newValues.insert(it.key, it.value);
         }
     }
     *coarseValues = newValues;
@@ -371,7 +373,7 @@ Sophus::SE3d dmvio::CoarseIMULogic::getCoarseKFPose()
     return Sophus::SE3d(coarseValues->at<gtsam::Pose3>(gtsam::Symbol('p', currentKeyframeId)).matrix());
 }
 
-void dmvio::CoarseIMULogic::updateCoarsePose(const Sophus::SE3& refToFrame)
+void dmvio::CoarseIMULogic::updateCoarsePose(const Sophus::SE3d& refToFrame)
 {
     // GTSAM expects currentImu to world, we passed referenceCamera to currentCamera.
     PoseTransformation& transformIMUToCoarse = *transformIMUToDSOForCoarse;
@@ -465,4 +467,3 @@ double dmvio::CoarseIMULogic::getScale() const
 {
     return scale;
 }
-

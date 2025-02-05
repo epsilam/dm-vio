@@ -27,7 +27,7 @@
 #include "IMUInitializerStates.h"
 
 dmvio::IMUInitializerLogic::IMUInitializerLogic(std::string resultsPrefix,
-                                                boost::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
+                                                std::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
                                                 const dmvio::IMUCalibration& imuCalibration,
                                                 dmvio::IMUInitSettings& settings,
                                                 DelayedMarginalizationGraphs* delayedMarginalization,

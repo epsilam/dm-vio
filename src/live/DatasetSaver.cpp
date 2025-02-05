@@ -21,22 +21,23 @@
 */
 
 #include "DatasetSaver.h"
-#include <boost/filesystem.hpp>
 #include <thread>
 #include <opencv2/imgcodecs.hpp>
 #include <iostream>
 #include <iomanip>
+#include <filesystem>
+#include <system_error>
 
 dmvio::DatasetSaver::DatasetSaver(std::string saveFolder)
 {
     // Throw exception if folder exists!
-    if(boost::filesystem::exists(saveFolder))
+    if(std::filesystem::exists(saveFolder))
     {
-        throw boost::filesystem::filesystem_error("Folder already exists.", boost::system::error_code());
+        throw std::filesystem::filesystem_error("Folder already exists.", std::error_code());
     }
-    boost::filesystem::create_directory(saveFolder);
-    boost::filesystem::path savePath(saveFolder);
-    boost::filesystem::create_directory(savePath / "cam0");
+    std::filesystem::create_directory(saveFolder);
+    std::filesystem::path savePath(saveFolder);
+    std::filesystem::create_directory(savePath / "cam0");
 
     imgSaveFolder = (savePath / "cam0").string();
 
@@ -111,4 +112,3 @@ void dmvio::DatasetSaver::end()
     frameArrivedCond.notify_all();
     imageSaveThread.join();
 }
-

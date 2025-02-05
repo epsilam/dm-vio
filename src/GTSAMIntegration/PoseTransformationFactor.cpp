@@ -119,7 +119,7 @@ void dmvio::PoseTransformationFactor::setFEJValues(std::shared_ptr<FEJValues> fe
     fej = std::move(fejPassed);
 }
 
-boost::shared_ptr<gtsam::GaussianFactor> dmvio::PoseTransformationFactor::linearize(const gtsam::Values& c) const
+std::shared_ptr<gtsam::GaussianFactor> dmvio::PoseTransformationFactor::linearize(const gtsam::Values& c) const
 {
     // First convert FEJValues for child factor.
     if(childFej)
@@ -232,11 +232,11 @@ boost::shared_ptr<gtsam::GaussianFactor> dmvio::PoseTransformationFactor::linear
 
     if(jacobianFac == nullptr)
     {
-        return boost::shared_ptr<gtsam::GaussianFactor>(
+        return std::shared_ptr<gtsam::GaussianFactor>(
                 new gtsam::JacobianFactor(terms, Ab.second));
     }else
     {
-        return boost::shared_ptr<gtsam::GaussianFactor>(
+        return std::shared_ptr<gtsam::GaussianFactor>(
                 new gtsam::JacobianFactor(terms, Ab.second, jacobianFac->get_model()));
     }
 

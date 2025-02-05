@@ -31,7 +31,8 @@
 #include "util/NumType.h"
 #include "util/globalCalib.h"
 #include "vector"
- 
+
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include "util/NumType.h"
@@ -43,6 +44,8 @@
 #include "FullSystem/PixelSelector2.h"
 #include "IMU/IMUIntegration.hpp"
 #include "util/GTData.hpp"
+#include <condition_variable>
+#include <functional>
 
 #include <math.h>
 #include "IMUInitialization/GravityInitializer.h"
@@ -176,7 +179,7 @@ private:
 public:
 	dmvio::IMUIntegration &getImuIntegration();
 
-	Sophus::SE3 firstPose; // contains transform from first to world.
+	Sophus::SE3d firstPose; // contains transform from first to world.
 
 private:
 	CalibHessian Hcalib;
@@ -194,7 +197,7 @@ private:
 	double linAllPointSinle(PointHessian* point, float outlierTHSlack, bool plot);
 
 	// mainPipelineFunctions
-    std::pair<Vec4, bool> trackNewCoarse(FrameHessian* fh, Sophus::SE3 *referenceToFrameHint = 0);
+    std::pair<Vec4, bool> trackNewCoarse(FrameHessian* fh, Sophus::SE3d *referenceToFrameHint = 0);
 	void traceNewCoarse(FrameHessian* fh);
 	void activatePoints();
 	void activatePointsMT();
@@ -270,15 +273,15 @@ private:
 
 
 	// =================== changed by tracker-thread. protected by trackMutex ============
-	boost::mutex trackMutex;
+	std::mutex trackMutex;
 	std::vector<FrameShell*> allFrameHistory;
-	std::vector<Sophus::SE3> gtPoses;
+	std::vector<Sophus::SE3d> gtPoses;
 	CoarseInitializer* coarseInitializer;
 	Vec5 lastCoarseRMSE;
 
 
 	// ================== changed by mapper-thread. protected by mapMutex ===============
-	boost::mutex mapMutex;
+	std::mutex mapMutex;
 	std::vector<FrameShell*> allKeyFramesHistory;
 
 	EnergyFunctional* ef;
@@ -298,7 +301,7 @@ private:
 
 
 	// mutex etc. for tracker exchange.
-	boost::mutex coarseTrackerSwapMutex;			// if tracker sees that there is a new reference, tracker locks [coarseTrackerSwapMutex] and swaps the two.
+	std::mutex coarseTrackerSwapMutex;			// if tracker sees that there is a new reference, tracker locks [coarseTrackerSwapMutex] and swaps the two.
 	CoarseTracker* coarseTracker_forNewKF;			// set as as reference. protected by [coarseTrackerSwapMutex].
 	CoarseTracker* coarseTracker;					// always used to track new frames. protected by [trackMutex].
 	float minIdJetVisTracker, maxIdJetVisTracker;
@@ -309,7 +312,7 @@ private:
 
 
 	// mutex for camToWorl's in shells (these are always in a good configuration).
-	boost::mutex& shellPoseMutex;
+	std::mutex& shellPoseMutex;
 
 
 
@@ -324,12 +327,12 @@ private:
 	void mappingLoop();
 
 	// tracking / mapping synchronization. All protected by [trackMapSyncMutex].
-	boost::mutex trackMapSyncMutex;
-	boost::condition_variable trackedFrameSignal;
-	boost::condition_variable mappedFrameSignal;
+	std::mutex trackMapSyncMutex;
+	std::condition_variable trackedFrameSignal;
+	std::condition_variable mappedFrameSignal;
 	std::deque<FrameHessian*> unmappedTrackedFrames;
 	int needNewKFAfter;	// Otherwise, a new KF is *needed that has ID bigger than [needNewKFAfter]*.
-	boost::thread mappingThread;
+	std::thread mappingThread;
 	bool runMapping;
 	bool needToKetchupMapping;
 
@@ -339,4 +342,3 @@ private:
 	bool secondKeyframeDone;
 };
 }
-

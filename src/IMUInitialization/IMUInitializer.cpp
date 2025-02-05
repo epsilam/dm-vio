@@ -32,7 +32,7 @@
 #include "IMUInitializerTransitions.h"
 
 dmvio::IMUInitializer::IMUInitializer(std::string resultsPrefix,
-                                      boost::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
+                                      std::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
                                       const IMUCalibration& imuCalibration, IMUInitSettings& settings,
                                       DelayedMarginalizationGraphs* delayedMarginalization, bool linearizeOperation,
                                       InitCallback callOnInit)
@@ -148,4 +148,3 @@ bool dmvio::thresholdVariableChanges(IMUThresholdSettings settings, const gtsam:
 
     return false;
 }
-

@@ -147,11 +147,11 @@ void IMUIntegration::addIMUDataToBA(const IMUData& imuData)
 }
 
 // returns estimated referenceToFrame.
-Sophus::SE3 IMUIntegration::addIMUData(const IMUData& imuData, int frameId, double frameTimestamp,
+Sophus::SE3d IMUIntegration::addIMUData(const IMUData& imuData, int frameId, double frameTimestamp,
                                        bool firstFrameAfterKFChange,
                                        int lastFrameId, bool onlyForHint)
 {
-    boost::shared_ptr<gtsam::PreintegratedImuMeasurements> additionalMeasurements;
+    std::shared_ptr<gtsam::PreintegratedImuMeasurements> additionalMeasurements;
     if(firstFrameAfterKFChange)
     {
         additionalMeasurements = preintegratedForNextCoarse;
@@ -180,13 +180,13 @@ Sophus::SE3 IMUIntegration::addIMUData(const IMUData& imuData, int frameId, doub
 }
 
 
-void IMUIntegration::updateCoarsePose(const Sophus::SE3& refToFrame)
+void IMUIntegration::updateCoarsePose(const Sophus::SE3d& refToFrame)
 {
     if(!coarseInitialized) return;
     coarseLogic->updateCoarsePose(refToFrame);
 }
 
-Sophus::SE3
+Sophus::SE3d
 IMUIntegration::computeCoarseUpdate(const dso::Mat88& H_in, const dso::Vec8& b_in, float extrapFac, float lambda,
                                     double& incA, double& incB, double& incNorm)
 {
@@ -266,7 +266,7 @@ void IMUIntegration::prepareKeyframe(int frameId)
         integrateIMUData(lastIMUData, *preintegratedBA);
     }else
     {
-        boost::shared_ptr<gtsam::PreintegratedImuMeasurements> swap = preintegratedBA;
+        std::shared_ptr<gtsam::PreintegratedImuMeasurements> swap = preintegratedBA;
         preintegratedBA = preintegratedBACurr;
         preintegratedBACurr = swap;
     }

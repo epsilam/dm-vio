@@ -66,12 +66,12 @@ public:
     }
 
     // Modified version of NoiseModelFactor::linearize of the project GTSAM. For license, see above.
-    boost::shared_ptr<gtsam::GaussianFactor> linearize(const gtsam::Values& x) const override
+    std::shared_ptr<gtsam::GaussianFactor> linearize(const gtsam::Values& x) const override
     {
         // TODO: update linearize if I update GTSAM.
         // Only linearize if the factor is active
         if(!T::active(x))
-            return boost::shared_ptr<gtsam::JacobianFactor>();
+            return std::shared_ptr<gtsam::JacobianFactor>();
 
         // Call evaluate error to get Jacobians and RHS vector b
         std::vector<gtsam::Matrix> A(T::size());
@@ -103,7 +103,7 @@ public:
         if(T::noiseModel_ && T::noiseModel_->isConstrained())
             return gtsam::GaussianFactor::shared_ptr(
                     new gtsam::JacobianFactor(terms, b,
-                                              boost::static_pointer_cast<Constrained>(T::noiseModel_)->unit()));
+                                              std::static_pointer_cast<Constrained>(T::noiseModel_)->unit()));
         else
             return gtsam::GaussianFactor::shared_ptr(new gtsam::JacobianFactor(terms, b));
     }

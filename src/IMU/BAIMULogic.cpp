@@ -199,7 +199,7 @@ void dmvio::BAIMULogic::addFirstBAFrame(int keyframeId, BAGraphs* baGraphs, gtsa
         gtsam::noiseModel::Diagonal::shared_ptr bias_prior_model = gtsam::noiseModel::Diagonal::Variances(
                 (gtsam::Vector(6) << 1e-2, 1e-2, 1e-2, 1e-3, 1e-3, 1e-3).finished());
         baGraphs->addFactor(
-                boost::make_shared<gtsam::PriorFactor<gtsam::imuBias::ConstantBias>>(bias_current_key, initialBias,
+                std::make_shared<gtsam::PriorFactor<gtsam::imuBias::ConstantBias>>(bias_current_key, initialBias,
                                                                                      bias_prior_model),
                 BIAS_AND_PRIOR_GROUP);
     }
@@ -207,7 +207,7 @@ void dmvio::BAIMULogic::addFirstBAFrame(int keyframeId, BAGraphs* baGraphs, gtsa
     if(imuSettings.setting_prior_velocity)
     {
         gtsam::noiseModel::Diagonal::shared_ptr velocity_prior_model = gtsam::noiseModel::Isotropic::Sigma(3, 1e-1);
-        baGraphs->addFactor(boost::make_shared<gtsam::PriorFactor<gtsam::Vector3>>(vel_current_key, initialVelocity,
+        baGraphs->addFactor(std::make_shared<gtsam::PriorFactor<gtsam::Vector3>>(vel_current_key, initialVelocity,
                                                                                    velocity_prior_model),
                             BIAS_AND_PRIOR_GROUP);
     }
@@ -233,7 +233,7 @@ void dmvio::BAIMULogic::setNextBAVel(const gtsam::Vector3& velocity, int frameId
 }
 
 void dmvio::BAIMULogic::addKeyframe(BAGraphs* baGraphs, gtsam::Values::shared_ptr baValues, int keyframeId,
-                                    const Sophus::SE3& keyframePose, std::vector<dso::EFFrame*>& frames)
+                                    const Sophus::SE3d& keyframePose, std::vector<dso::EFFrame*>& frames)
 {
     if(disableFromKF > 0 && keyframeId > disableFromKF)
     {
@@ -286,7 +286,7 @@ void dmvio::BAIMULogic::addKeyframe(BAGraphs* baGraphs, gtsam::Values::shared_pt
         // Note: The graph optimizes poses with worldToCam in DSO scale. The IMU factor works on metric poses with imuToWorld.
         // To transform between the two we use our PoseTransformationFactor and the transformDSOToIMU.
         // This will also add the scale and gravity direction as optimizable variables to our factor graph.
-        auto transformedFactor = boost::make_shared<PoseTransformationFactor>(imuFactor,
+        auto transformedFactor = std::make_shared<PoseTransformationFactor>(imuFactor,
                                                                               *transformDSOToIMU,
                                                                               PoseTransformationFactor::JACOBIAN_FACTOR);
         baGraphs->addFactor(transformedFactor, METRIC_GROUP);

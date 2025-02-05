@@ -44,7 +44,7 @@
 	#include "zip.h"
 #endif
 
-#include <boost/thread.hpp>
+#include <thread>
 
 using namespace dso;
 
@@ -252,7 +252,7 @@ public:
 	    // returning IMU data between frame i-1 and frame i!
 	    return imuDataAllFrames[i - 1];
     }
-    
+
     dmvio::GTData getGTData(int id, bool &foundOut)
     {
         long long idReal = ids[id];
@@ -288,12 +288,12 @@ public:
         foundOut = true;
         return it->second;
     }
-    
+
     bool loadGTData(std::string gtFile)
     {
         std::string defaultFile = path.substr(0, path.find_last_of('/')) + "/../state_groundtruth_estimate0/data.csv";
         std::cout << "Loading gt data" << std::endl;
-        
+
         if(gtFile == "")
         {
             gtFile = defaultFile;
@@ -301,7 +301,7 @@ public:
 
         std::ifstream tr;
         tr.open(gtFile.c_str());
-        
+
         if(!tr.good())
         {
             return false;
@@ -311,7 +311,7 @@ public:
             std::string line;
             char buf[1000];
             tr.getline(buf, 1000);
-            
+
             long long id;
             double p1, p2, p3, qw, qx, qy, qz, v1, v2, v3, br1, br2, br3, bp1, bp2, bp3;
             if(17 == sscanf(buf, "%lld,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &id, &p1, &p2, &p3, &qw, &qx, &qy, &qz, &v1, &v2, &v3, &br1, &br2, &br3, &bp1, &bp2, &bp3))
@@ -319,11 +319,11 @@ public:
                 // EuRoC format with bias GT.
                 Eigen::Vector3d translation(p1, p2, p3);
                 Eigen::Quaterniond quat(qw, qx, qy, qz);
-                Sophus::SE3 pose(quat, translation);
+                Sophus::SE3d pose(quat, translation);
                 Eigen::Vector3d velocity(v1, v2, v3);
                 Eigen::Vector3d biasRot(br1, br2, br3);
                 Eigen::Vector3d biasPos(bp1, bp2, bp3);
-                
+
                 gtData[id] = dmvio::GTData(pose, velocity, biasRot, biasPos);
 
             } else if(8 == sscanf(buf, "%lld,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &id, &p1, &p2, &p3, &qw, &qx, &qy, &qz))
@@ -331,7 +331,7 @@ public:
                 // TUM-VI format
                 Eigen::Vector3d translation(p1, p2, p3);
                 Eigen::Quaterniond quat(qw, qx, qy, qz);
-                Sophus::SE3 pose(quat, translation);
+                Sophus::SE3d pose(quat, translation);
                 Eigen::Vector3d velocity(0.0, 0.0, 0.0);
                 Eigen::Vector3d biasRot(0.0, 0.0, 0.0);
                 Eigen::Vector3d biasPos(0.0, 0.0, 0.0);
@@ -613,4 +613,3 @@ private:
 	char* databuffer;
 #endif
 };
-

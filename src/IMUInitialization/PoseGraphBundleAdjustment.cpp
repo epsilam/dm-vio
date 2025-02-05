@@ -302,7 +302,7 @@ int dmvio::PoseGraphBundleAdjustment::insertIMUFactorsAndValues(NonlinearFactorG
                               imuData));
 
         // The IMUFactor needs to be transformed (from IMU frame to DSO frame).
-        auto transformedFactor = boost::make_shared<PoseTransformationFactor>(imuFactor,
+        auto transformedFactor = std::make_shared<PoseTransformationFactor>(imuFactor,
                                                                               *transformDSOToIMU,
                                                                               settings.conversionType);
         graph.add(transformedFactor);
@@ -403,7 +403,7 @@ gtsam::NonlinearFactor::shared_ptr dmvio::compensateNegativeEnergy(NonlinearFact
         JacobianFactor::shared_ptr constantFactor(new JacobianFactor(scaleKey, gtsam::Matrix11::Zero(), bConst));
         Values linPoint;
         linPoint.insert(scaleKey, ScaleGTSAM(transformForFakeFactor.getScale()));
-        auto lcf = boost::make_shared<LinearContainerFactor>(constantFactor, linPoint);
+        auto lcf = std::make_shared<LinearContainerFactor>(constantFactor, linPoint);
         return lcf;
     }
     return nullptr;

@@ -28,7 +28,7 @@
 
 #include "util/NumType.h"
 #include "algorithm"
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 namespace dso
 {
@@ -60,7 +60,7 @@ public:
 	int marginalizedAt;
 	double movedByOpt;
 
-    static boost::mutex shellPoseMutex;
+    static std::mutex shellPoseMutex;
 
 	inline FrameShell()
 	{
@@ -79,4 +79,3 @@ public:
 
 
 }
-

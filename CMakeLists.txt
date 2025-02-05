@@ -14,9 +14,8 @@ set(LIBRARY_OUTPUT_PATH lib)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 # required libraries
-find_package(SuiteParse REQUIRED)
-find_package(Eigen3 REQUIRED)
-find_package(Boost COMPONENTS system thread filesystem chrono serialization date_time timer)
+find_package(Eigen3 REQUIRED NO_MODULE)
+find_package(Boost REQUIRED)
 find_package(GTSAM REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
@@ -56,7 +55,7 @@ set(CMAKE_CXX_FLAGS_RELEASE
 	"-O3 -DNDEBUG"
 )
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 if (MSVC)
      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
@@ -128,13 +127,13 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/thirdparty/sse2neon
   ${EIGEN3_INCLUDE_DIR}
   ${GTSAM_INCLUDE_DIR}
-) 
+)
 
 
 # decide if we have pangolin
 if (Pangolin_FOUND)
 	message("--- found PANGOLIN, compiling with pangolin library.")
-	include_directories( ${Pangolin_INCLUDE_DIRS} ) 
+	include_directories( ${Pangolin_INCLUDE_DIRS} )
 	set(dso_pangolin_SOURCE_FILES
 			${DSO_SOURCE_DIR}/IOWrapper/Pangolin/KeyFrameDisplay.cpp
 			${DSO_SOURCE_DIR}/IOWrapper/Pangolin/PangolinDSOViewer.cpp
@@ -168,14 +167,14 @@ endif ()
 if (LIBZIP_LIBRARY)
 	message("--- found ziplib (${LIBZIP_VERSION}), compiling with zip capability.")
 	add_definitions(-DHAS_ZIPLIB=1)
-	include_directories( ${LIBZIP_INCLUDE_DIR_ZIP} ${LIBZIP_INCLUDE_DIR_ZIPCONF} ) 
+	include_directories( ${LIBZIP_INCLUDE_DIR_ZIP} ${LIBZIP_INCLUDE_DIR_ZIPCONF} )
 else()
 	message("--- not found ziplib (${LIBZIP_LIBRARY}), compiling without zip capability.")
 	set(LIBZIP_LIBRARY "")
 endif()
 
 # compile main library.
-include_directories( ${CSPARSE_INCLUDE_DIR} ${CHOLMOD_INCLUDE_DIR} ${YAML_CPP_INCLUDE_DIR})
+include_directories(${YAML_CPP_INCLUDE_DIR})
 add_library(dmvio ${dso_SOURCE_FILES} ${dmvio_SOURCE_FILES} ${dso_opencv_SOURCE_FILES} ${dso_pangolin_SOURCE_FILES})
 
 
@@ -190,7 +189,7 @@ endif()
 if (OpenCV_FOUND AND Pangolin_FOUND)
 	message("--- compiling dmvio_dataset.")
 	add_executable(dmvio_dataset ${PROJECT_SOURCE_DIR}/src/main_dmvio_dataset.cpp)
-	set(DMVIO_LINKED_LIBRARIES boost_system cxsparse ${BOOST_THREAD_LIBRARY} ${LIBZIP_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS} gtsam ${YAML_CPP_LIBRARIES} ${STACKTRACE_LIBRARIES})
+	set(DMVIO_LINKED_LIBRARIES boost_system ${BOOST_THREAD_LIBRARY} ${LIBZIP_LIBRARY} ${Pangolin_LIBRARIES} ${OpenCV_LIBS} gtsam ${YAML_CPP_LIBRARIES} ${STACKTRACE_LIBRARIES})
     target_link_libraries(dmvio_dataset dmvio ${DMVIO_LINKED_LIBRARIES})
 
 	if(realsense2_FOUND)

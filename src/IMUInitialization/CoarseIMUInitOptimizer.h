@@ -33,6 +33,7 @@
 #include <gtsam/nonlinear/Marginals.h>
 #include "IMU/IMUSettings.h"
 #include <fstream>
+#include <deque>
 
 namespace dso
 {

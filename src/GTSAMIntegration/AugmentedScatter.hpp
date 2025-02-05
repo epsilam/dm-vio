@@ -38,7 +38,7 @@ class AugmentedScatter : public gtsam::Scatter
 {
 public:
     // Scatter that can additionally handle keys that don't exist in the factor graph. For those keys the dimension must be specified in keyDimMap
-    AugmentedScatter(const gtsam::GaussianFactorGraph& gfg,boost::optional<const gtsam::Ordering&> ordering, const std::map<gtsam::Key, size_t>& keyDimMap);
+    AugmentedScatter(const gtsam::GaussianFactorGraph& gfg, const gtsam::Ordering& ordering, const std::map<gtsam::Key, size_t>& keyDimMap);
 
     iterator findNew(gtsam::Key key);
 

@@ -1,6 +1,6 @@
 /**
 * This file is part of DSO.
-* 
+*
 * Copyright 2016 Technical University of Munich and Intel.
 * Developed by Jakob Engel <engelj at in dot tum dot de>,
 * for more information see <http://vision.in.tum.de/dso>.
@@ -22,7 +22,7 @@
 */
 
 
- 
+
 #include "FullSystem/HessianBlocks.h"
 #include "util/FrameShell.h"
 #include "FullSystem/ImmaturePoint.h"
@@ -81,8 +81,8 @@ void FrameHessian::setStateZero(const Vec10 &state_zero)
 	for(int i=0;i<6;i++)
 	{
 		Vec6 eps; eps.setZero(); eps[i] = 1e-3;
-		SE3 EepsP = Sophus::SE3::exp(eps);
-		SE3 EepsM = Sophus::SE3::exp(-eps);
+		SE3 EepsP = Sophus::SE3d::exp(eps);
+		SE3 EepsM = Sophus::SE3d::exp(-eps);
 		SE3 w2c_leftEps_P_x0 = (get_worldToCam_evalPT() * EepsP) * get_worldToCam_evalPT().inverse();
 		SE3 w2c_leftEps_M_x0 = (get_worldToCam_evalPT() * EepsM) * get_worldToCam_evalPT().inverse();
 		nullspaces_pose.col(i) = (w2c_leftEps_P_x0.log() - w2c_leftEps_M_x0.log())/(2e-3);
@@ -223,4 +223,3 @@ void FrameFramePrecalc::set(FrameHessian* host, FrameHessian* target, CalibHessi
 }
 
 }
-

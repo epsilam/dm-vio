@@ -35,10 +35,10 @@ dmvio::marginalizeOut(const gtsam::NonlinearFactorGraph& graph, const gtsam::Val
     if(keysToMarginalize.empty())
     {
         std::cout << "WARNING: Calling marginalizeOut with empty keysToMarginalize." << std::endl;
-        return boost::shared_ptr<gtsam::NonlinearFactorGraph>(new gtsam::NonlinearFactorGraph(graph));
+        return std::shared_ptr<gtsam::NonlinearFactorGraph>(new gtsam::NonlinearFactorGraph(graph));
     }
 
-    boost::shared_ptr<gtsam::NonlinearFactorGraph> newGraph(new gtsam::NonlinearFactorGraph);
+    std::shared_ptr<gtsam::NonlinearFactorGraph> newGraph(new gtsam::NonlinearFactorGraph);
 
     gtsam::NonlinearFactorGraph marginalizedOutGraph;
 
@@ -178,4 +178,3 @@ gtsam::Matrix dmvio::computeSchurComplement(const gtsam::Matrix& augmentedHessia
 
     return augmentedHRes;
 }
-

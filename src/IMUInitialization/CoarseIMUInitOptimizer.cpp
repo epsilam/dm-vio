@@ -104,7 +104,7 @@ void dmvio::CoarseIMUInitOptimizer::addPose(int frameId, const Sophus::SE3d& cam
             fixedValues.insert(P(prevFrameId), prevFramePose);
             fixedValues.insert(P(frameId), framePose);
         }
-        auto transformedFactor = boost::make_shared<PoseTransformationFactor>(imuFactor,
+        auto transformedFactor = std::make_shared<PoseTransformationFactor>(imuFactor,
                                                                               *transformDSOToIMU,
                                                                               settings.conversionType, fixedValues);
 
@@ -162,7 +162,7 @@ dmvio::CoarseIMUInitOptimizer::OptimizationResult dmvio::CoarseIMUInitOptimizer:
     if(settings.updatePoses)
     {
         // Get the newest poses from DSO.
-        boost::unique_lock<boost::mutex> lock(dso::FrameShell::shellPoseMutex);
+        std::unique_lock<std::mutex> lock(dso::FrameShell::shellPoseMutex);
         for(auto&& factor : graph)
         {
             PoseTransformationFactor* casted = dynamic_cast<PoseTransformationFactor*>(factor.get());
@@ -236,7 +236,7 @@ void CoarseIMUInitOptimizer::takeOverOptimizedValues()
 
 void CoarseIMUInitOptimizer::addPose(const dso::FrameShell& shell, const gtsam::PreintegratedImuMeasurements* imuData)
 {
-    boost::unique_lock<boost::mutex> lock(dso::FrameShell::shellPoseMutex);
+    std::unique_lock<std::mutex> lock(dso::FrameShell::shellPoseMutex);
     if(settings.updatePoses)
     {
         activeShells[shell.id] = &shell;

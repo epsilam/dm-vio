@@ -306,7 +306,7 @@ DelayedGraph::DelayedGraph(int delayN, int maxGroupInGraph, const gtsam::Nonline
 
 DelayedGraph::DelayedGraph(const DelayedGraph& other)
         : delayN(other.delayN), maxGroupInGraph(other.maxGroupInGraph),
-          graph(boost::make_shared<gtsam::NonlinearFactorGraph>(other.graph->clone())),
+          graph(std::make_shared<gtsam::NonlinearFactorGraph>(other.graph->clone())),
           marginalizationOrder(other.marginalizationOrder), delayedValues(other.delayedValues),
           delayedCurrValues(other.delayedCurrValues), fejValues(new FEJValues(*(other.fejValues)))
 {}

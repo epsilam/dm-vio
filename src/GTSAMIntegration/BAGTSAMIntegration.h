@@ -218,7 +218,7 @@ private:
 
     GTSAMIntegrationSettings settings;
 
-    boost::shared_ptr<gtsam::Values> baValues, baEvalValues, newBAValues, baValuesAfterBAUpdate;
+    std::shared_ptr<gtsam::Values> baValues, baEvalValues, newBAValues, baValuesAfterBAUpdate;
     gtsam::Ordering baOrdering, baOrderingSmall; // baOrdering contains all keys and baOrderingSmall only the ones known by DSO (only poses).
     std::map<gtsam::Key, size_t> baDimMap;
 

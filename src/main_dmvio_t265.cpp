@@ -38,7 +38,7 @@
 #include "util/Undistort.h"
 
 
-#include <boost/thread.hpp>
+#include <thread>
 #include "dso/util/settings.h"
 #include "dso/util/globalFuncs.h"
 #include "dso/util/globalCalib.h"
@@ -58,7 +58,7 @@
 #include "util/MainSettings.h"
 #include "live/FrameSkippingStrategy.h"
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 // If mainSettings.calib is set we use this instead of the factory calibration.
 std::string calibSavePath = "./factoryCalibrationT265Camera.txt"; // Factory calibration will be saved here.
@@ -233,14 +233,14 @@ int main(int argc, char** argv)
     }
 
     // hook crtl+C.
-    boost::thread exThread = boost::thread(exitThread);
+    std::thread exThread = std::thread(exitThread);
 
     if(saveDatasetPath != "")
     {
         try
         {
             datasetSaver = std::make_unique<dmvio::DatasetSaver>(saveDatasetPath);
-        } catch(const boost::filesystem::filesystem_error& err)
+        } catch(const std::filesystem::filesystem_error& err)
         {
             std::cout << "ERROR: Cannot save dataset: " << err.what() << std::endl;
         }
@@ -287,7 +287,7 @@ int main(int argc, char** argv)
                                                                           normalizeCamSize);
 
 
-        boost::thread runThread = boost::thread(boost::bind(run, viewer, undistorter.get()));
+        std::thread runThread = std::thread(std::bind(run, viewer, undistorter.get()));
 
         viewer->run();
 

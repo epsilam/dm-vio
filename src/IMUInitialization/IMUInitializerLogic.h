@@ -56,7 +56,7 @@ public:
     typedef std::function<void(const gtsam::Values& values, bool)> InitCallback;
 
     IMUInitializerLogic(std::string resultsPrefix,
-                        boost::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
+                        std::shared_ptr<gtsam::PreintegrationParams> preintegrationParams,
                         const dmvio::IMUCalibration& imuCalibration,
                         dmvio::IMUInitSettings& settings,
                         DelayedMarginalizationGraphs* delayedMarginalization,

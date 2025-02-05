@@ -26,7 +26,7 @@
 
 #pragma once
 #include <pangolin/pangolin.h>
-#include "boost/thread.hpp"
+#include <thread>
 #include "util/MinimalImage.h"
 #include "IOWrapper/Output3DWrapper.h"
 #include <map>
@@ -83,7 +83,7 @@ public:
     virtual void publishCamPose(FrameShell* frame, CalibHessian* HCalib) override;
     virtual void publishSystemStatus(dmvio::SystemStatus systemStatus) override;
 
-    void addGTCamPose(const Sophus::SE3& gtPose);
+    void addGTCamPose(const Sophus::SE3d& gtPose);
 
     virtual void pushLiveFrame(FrameHessian* image) override;
     virtual void pushDepthImage(MinimalImageB3* image) override;
@@ -100,7 +100,7 @@ private:
 	void reset_internal();
 	void drawConstraints();
 
-	boost::thread runThread;
+	std::thread runThread;
 	bool running;
 	bool shouldQuitVar{false};
 	int w,h;
@@ -108,7 +108,7 @@ private:
 
 
 	// images rendering
-	boost::mutex openImagesMutex;
+	std::mutex openImagesMutex;
 	MinimalImageB3* internalVideoImg;
 	MinimalImageB3* internalKFImg;
 	MinimalImageB3* internalResImg;
@@ -118,7 +118,7 @@ private:
     CalibHessian *HCalib;
 
 	// 3D model rendering
-	boost::mutex model3DMutex;
+	std::mutex model3DMutex;
 	KeyFrameDisplay* currentCam, *currentGTCam;
 	std::vector<KeyFrameDisplay*> keyframes;
 	std::vector<Vec3f,Eigen::aligned_allocator<Vec3f>> allFramePoses;
