@@ -148,7 +148,7 @@ void MainSettings::parseArgument(char* arg, SettingsUtil& settingsUtil)
             setting_photometricCalibration = 0;
             setting_affineOptModeA = -1; //-1: fix. >=0: optimize (with prior, if > 0).
             setting_affineOptModeB = -1; //-1: fix. >=0: optimize (with prior, if > 0).
-            setting_minGradHistAdd = 3;
+            setting_minGradHistAdd = 5;
         }
         if(option == 3)
         {
@@ -220,7 +220,7 @@ void dmvio::MainSettings::settingsDefault(int preset)
         setting_desiredImmatureDensity = 1500;
         setting_desiredPointDensity = 1000;
         setting_minFrames = 5;
-        setting_maxFrames = 7;
+        setting_maxFrames = 10;
         setting_maxOptIterations = 6;
         setting_minOptIterations = 1;
 
@@ -243,7 +243,7 @@ void dmvio::MainSettings::settingsDefault(int preset)
         setting_desiredImmatureDensity = 600;
         setting_desiredPointDensity = 800;
         setting_minFrames = 4;
-        setting_maxFrames = 6;
+        setting_maxFrames = 10;
         setting_maxOptIterations = 4;
         setting_minOptIterations = 1;
 
@@ -255,4 +255,3 @@ void dmvio::MainSettings::settingsDefault(int preset)
 
     printf("==============================================\n");
 }
-
