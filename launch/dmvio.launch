@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Modal parameters -->
+    <arg name="camera_direction" default="down_l"/>
+    <arg name="mode" default="2" doc="Camera calibration mode"/>
+    <arg name="nogui" default="0" doc="Set to 1 to disable GUI"/>
+    <arg name="preset" default="1" doc="Preset configuration number"/>
+    <arg name="useimu" default="1" doc="Set to 1 to enable IMU"/>
+    <arg name="quiet" default="1" doc="Set to 1 for less verbose output"/>
+
+    <!-- Advanced parameters -->
+    <arg name="requestFullResetErrorThreshold" default="100"/>
+    <arg name="init_requestFullResetNormalizedErrorThreshold" default="100"/>
+    <arg name="init_pgba_skipFirstKFs" default="1"/>
+
+    <!-- Parameter files -->
+    <arg name="calib_file" default="$(find dmvio_ros)/configs/dji_$(arg camera_direction)/camera.txt" doc="Path to camera calibration file"/>
+    <arg name="settings_file" default="$(find dmvio_ros)/configs/dji_$(arg camera_direction)/settings.yaml" doc="Path to settings YAML file"/>
+    <arg name="imuCalib" default="$(find dmvio_ros)/configs/dji_$(arg camera_direction)/camchain-imucam.yaml" doc="Path to camera-imu calibration (output from Kalibr)"/>
+
+    <!-- Input topic names -->
+    <arg name="image_topic" default="/visual_perception/$(arg camera_direction)" doc="Input image topic"/>
+    <arg name="imu_topic" default="/dji_osdk_ros/imu" doc="Input IMU topic"/>
+
+    <!-- Output topic names -->
+    <arg name="pose_topic" default="dmvio/pose" doc="Output pose topic"/>
+    <arg name="odometry_topic" default="dmvio/odometry" doc="Output odometry topic"/>
+    <arg name="pointcloud_topic" default="dmvio/pointcloud" doc="Output pointcloud topic"/>
+
+    <!-- Optional rosbag playback -->
+    <arg name="bag_file" default="" doc="Path to rosbag file"/>
+    <arg name="start_bag" default="false" doc="Set to true to play the bag file"/>
+
+    <!-- Image transport hint -->
+    <arg name="image_transport" default="raw"/>
+
+
+    <!-- Main node. Do not modify the parameters below. -->
+    <node name="dmvio" pkg="dmvio_ros" type="node" output="screen"
+          args="calib=$(arg calib_file)
+                settingsFile=$(arg settings_file)
+                mode=$(arg mode)
+                nogui=$(arg nogui)
+                preset=$(arg preset)
+                useimu=$(arg useimu)
+                imuCalib=$(arg imuCalib)
+                quiet=$(arg quiet)
+                requestFullResetErrorThreshold=$(arg requestFullResetErrorThreshold)
+                init_requestFullResetNormalizedErrorThreshold=$(arg init_requestFullResetNormalizedErrorThreshold)
+                init_pgba_skipFirstKFs=$(arg init_pgba_skipFirstKFs)">
+
+        <!-- Set the image transport -->
+        <param name="image_transport" value="$(arg image_transport)"/>
+
+        <!-- Topic remappings -->
+        <remap from="cam0/image_raw" to="$(arg image_topic)"/>
+        <remap from="cam0/image_raw/compressed" to="$(arg image_topic)/compressed" />
+        <remap from="imu0" to="$(arg imu_topic)"/>
+        <remap from="dmvio/pose" to="$(arg pose_topic)"/>
+        <remap from="dmvio/odometry" to="$(arg odometry_topic)"/>
+        <remap from="dmvio/pointcloud" to="$(arg pointcloud_topic)"/>
+    </node>
+
+    <!-- Optional rosbag play -->
+    <node if="$(arg start_bag)"
+          name="rosbag"
+          pkg="rosbag"
+          type="play"
+          args="$(arg bag_file)"
+          required="true"/>
+
+</launch>
